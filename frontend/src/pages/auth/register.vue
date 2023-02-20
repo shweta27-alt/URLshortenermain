@@ -6,7 +6,6 @@
       <auth-wrapper>
         <div class="upper">
           <div class="text-slogen">Sign up to simplify your links</div>
-  
           <div class="full-name">
             <input
               type="text"
@@ -212,7 +211,7 @@
             .register(data)
             .then(() => {
               this.isloading=false
-              this.$router.push("/chat");
+              this.$router.push("/main");
             })
             .catch((error) => {
               this.isloading=false

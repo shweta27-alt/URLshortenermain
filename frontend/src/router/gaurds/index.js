@@ -22,7 +22,7 @@ export function checkNonAuthenticatedUser(to,from,next){
         if(!response.isLoggedInUser){
         return next()
         }
-        window.location.href= `${window.location.origin}/chat`
+        window.location.href= `${window.location.origin}/main`
      })
      .catch((error)=>{
        next()

@@ -6,7 +6,7 @@ const getHeader = () => {
 };
 
 const getUrl = () => {
-  return "http://localhost:5080";
+  return "http://localhost:8080";
 };
 
 // api service to contain all api
@@ -17,9 +17,14 @@ const apiService = {
   register(data) {
     return axios.post( getUrl() + "/authentication/register/form", data, { withCredentials: true }, getHeader() );
   },
-
   logout() {
     return axios.post(getUrl() + "/authentication/logout",{},{ withCredentials: true }, getHeader());
+  },
+  usersession() {
+    return axios.get(getUrl() + "/authentication/usersession", { withCredentials: true }, getHeader())
+  },
+  shorturl(data) {
+    return axios.post( getUrl() + "/short-url", data, { withCredentials: true }, getHeader() );
   },
 };
 

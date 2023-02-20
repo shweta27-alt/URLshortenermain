@@ -5,7 +5,7 @@ export function create() {
         history:createWebHistory(),
         routes: [
             ...require('./auth'), 
-            
+            ...require('./main')
         ]
     });
 }

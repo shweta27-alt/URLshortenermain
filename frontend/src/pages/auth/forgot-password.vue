@@ -14,7 +14,6 @@
               @keyup.enter="resetPassword"
             />
           </div>
-  
           <div class="password">
             <input
               type="password"

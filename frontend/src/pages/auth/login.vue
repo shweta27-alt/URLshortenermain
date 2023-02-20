@@ -76,7 +76,7 @@
               this.isloading=false
               this.showError = false;
               this.errorMessage = "";
-              this.$router.push("/chat");
+              this.$router.push("/main");
             })
             .catch((error) => {
               this.isloading=false

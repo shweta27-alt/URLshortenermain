@@ -26,6 +26,9 @@ const apiService = {
   shorturl(data) {
     return axios.post( getUrl() + "/short-url", data, { withCredentials: true }, getHeader() );
   },
+  getAnalytics(data) {
+    return axios.get( getUrl() + `/analytics/${data.shortId}`,{ withCredentials: true }, getHeader() );
+  },
 };
 
 export default apiService;

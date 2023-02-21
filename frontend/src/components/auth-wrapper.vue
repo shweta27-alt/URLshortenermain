@@ -1,6 +1,7 @@
 <template>
     <div class="auth-wrapper">
       <div class="upper-part">
+        <img src="../assets/logo.png" alt="">
         <div class="login-register">
           <div class="login" @click="login">Login</div>
           <div class="signin" @click="newlogin">Sign-up</div>
@@ -24,7 +25,7 @@
   };
   </script>
   
-  <style>
+  <style scoped lang="scss">
   .upper-part {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     padding:15px;
@@ -52,9 +53,18 @@
   .login{
     margin-right:60px;
     margin-bottom:30px;
+    cursor: pointer;
+  }
+
+  .signin{
+    cursor: pointer;
   }
 
   .auth-wrapper{
     background-color: rgb(255, 255, 255);
   }
+
+  img {
+  height: 50px;
+}
   </style>

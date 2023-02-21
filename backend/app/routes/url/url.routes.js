@@ -113,10 +113,8 @@ router.post("/short-url", async (req, res, next) => {
           const newVal = new Counter({ id: "autoval", counter: 100000000 });
           newVal.save();
         }
-        let base62Counter = cd.counter || 1000000;
-        console.log(base62Counter, typeof base62Counter);
+        let base62Counter = cd.counter || 10000000;
         const shortId = base62(base62Counter);
-        console.log(shortId);
         let urlInstance = new Url({
           shortId: shortId,
           redirectUrl: url,
@@ -135,6 +133,9 @@ router.post("/short-url", async (req, res, next) => {
 //route to redect to long url
 router.get("/:shortId", async (req, res, next) => {
   const shortId = req.params.shortId;
+  if (!shortId) {
+    return res.status(400).json({ message: "Something went wrong" });
+  }
   let data = await Url.findOneAndUpdate(
     {
       shortId,
@@ -146,6 +147,25 @@ router.get("/:shortId", async (req, res, next) => {
     }
   );
   res.redirect(data.redirectUrl);
+});
+
+
+
+router.get("/analytics/:shortId", async (req, res, next) => {
+  const shortId = req.params.shortId;
+  if (!shortId) {
+    return res.status(400).json({ message: "Something went wrong" });
+  }
+  let result = await Url.findOne({shortId});
+  if(result){
+    return res
+    .status(200)
+    .json({
+      totalClicks: result.visitHistory.length,
+      analytics: result.visitHistory,
+    });
+  }
+  return res.status(400).json({ message: "No Data Found" });
 });
 
 module.exports = router;

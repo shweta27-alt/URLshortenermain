@@ -9,16 +9,39 @@
     <div class="url-short-wrapper">
       <div class="url-short-text">Shorten URL Is Just Simple</div>
       <div class="input-wrapper">
-        <input v-model="url" placeholder="Enter long url here" type="text" class="url-short-input" />
+        <input
+          v-model="url"
+          placeholder="Enter long url here"
+          type="text"
+          class="url-short-input"
+        />
         <button class="url-short-button" @click="getShortUrl">submit</button>
       </div>
-      <div v-if="shortUrl" class="short-url">
-        Your Short urL:-<a
-          :href="shortUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          >{{ shortUrl }}</a
-        >
+      <div class="error-url" v-if="isInvalidUrl">
+        Please provide a valid Url
+      </div>
+      <div v-if="shortUrl" class="url-result-wrapper">
+        <div class="short-url">
+          Your Short URL:- <a
+            :href="shortUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            >{{ shortUrl }}</a
+          >
+        </div>
+        <div @click="getAnalytics" class="show-analytics">Analytics</div>
+      </div>
+      <div v-if="showAnalytics">
+        <table class="analytics-data">
+          <tr>
+            <th>Click</th>
+            <th>Latest Timestamp</th>
+          </tr>
+          <tr>
+            <td>{{ analyticsData.totalClicks }}</td>
+            <td>{{ analyticsData.latestTimestamp }}</td>
+          </tr>
+        </table>
       </div>
     </div>
   </div>
@@ -31,6 +54,13 @@ export default {
     return {
       url: "",
       shortUrl: "",
+      isInvalidUrl: false,
+      shortId: "",
+      showAnalytics:false,
+      analyticsData: {
+        totalClicks: 0,
+        latestTimestamp: "Not Clicked",
+      },
     };
   },
   methods: {
@@ -46,25 +76,53 @@ export default {
         });
     },
     getShortUrl() {
-      let data = {
-        url: this.url,
-      };
+      const regexp =
+        /^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/;
+      if (!regexp.test(this.url)) {
+        return (this.isInvalidUrl = true);
+      }
+      this.isInvalidUrl = false;
+      if (this.url) {
+        let data = {
+          url: this.url,
+        };
+        apiService
+          .shorturl(data)
+          .then(({ data }) => {
+            if (data.id) {
+              this.shortId = data.id;
+              this.shortUrl = `http://localhost:8080/${data.id}`;
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    },
+    getAnalytics() {
+      let data = { shortId: this.shortId };
       apiService
-        .shorturl(data)
+        .getAnalytics(data)
         .then(({ data }) => {
-          if (data.id) {
-            this.shortUrl = `http://localhost:8080/${data.id}`;
+          if (data) {
+            this.showAnalytics=true;
+            this.analyticsData.totalClicks = data.totalClicks;
+            this.analyticsData.latestTimestamp =
+              data.analytics.length > 0
+                ?   new Date(data.analytics[data.analytics.length - 1].timestamp).toLocaleString()
+                : "Not Clicked";
           }
         })
         .catch((error) => {
           console.log(error);
+          this.showAnalytics=false;
         });
     },
   },
 };
 </script>
 
-<style>
+<style scoped lang="scss">
 .url-short-wrapper {
   background: #ffffff;
   border-radius: 20px;
@@ -95,7 +153,7 @@ export default {
   font-size: 16px;
   padding-top: 3px;
   width: 540px;
-  margin-bottom: 25px;
+  margin-bottom: 15px;
 }
 .input-wrapper {
   display: flex;
@@ -139,5 +197,33 @@ img {
   text-transform: uppercase;
   font-weight: bold;
   cursor: pointer;
+}
+.error-url {
+  color: red;
+  font-size: 18px;
+  margin-left: 26px;
+  text-align: left;
+}
+.url-result-wrapper {
+  display: flex;
+  justify-content: space-between;
+  width: 60%;
+}
+
+.analytics-data {
+  border-collapse: collapse;
+    width: 50%;
+    margin-top: 17px;
+    margin-left: 28px;
+  td,
+  th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+  }
+}
+.show-analytics{
+  cursor: pointer;
+  color: rgb(2, 136, 209);
 }
 </style>
